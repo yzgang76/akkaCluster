@@ -74,7 +74,7 @@ abstract class Collector extends Actor with Timers {
     }
 
     override def receive: Receive = {
-        case CmdKPIRefresh(kpiName, host, ts) if kpiNames.contains(kpiName) && ((host == null)|| host.equals(this.host)) =>
+        case CmdKPIRefresh(kpiName, host, ts) if kpiNames.contains(kpiName) && ((host == null) || host.equals(this.host)) =>
             //make sure the value of 'host' from FE is same as that in BE
             LOGGER.debug(s"Received CMD to refresh the collector ${new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ts)}")
             publish(collect)
@@ -92,8 +92,11 @@ abstract class Collector extends Actor with Timers {
             records.foreach(r => mediator ! DistributedPubSubMediator.Publish(topic, r))
     }
 
-    protected def setTimer(interval: Int): Unit =
+    protected def setTimer(interval: Int): Unit = {
+        publish(collect)  //run collector at beginning
         if (interval > 0) timers.startPeriodicTimer("collect", Collect, interval.seconds)
+    }
+
 
     protected def stopSelf() = context stop self
 

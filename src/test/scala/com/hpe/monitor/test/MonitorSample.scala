@@ -14,6 +14,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import com.hpe.ossm.jmonitor.test.CollectorInJava
+
 object Run {
     def main(args: Array[String]): Unit = {
         new MonitorSample
@@ -22,7 +23,7 @@ object Run {
 
 class MonitorSample extends ClusterNode("selfMonitor", null) {
     system.actorOf(Props(classOf[MyTestCollector]))
-//    system.actorOf(Props(classOf[CollectorInJava]))
+    //    system.actorOf(Props(classOf[CollectorInJava]))
     system.actorOf(Props(classOf[MyListener]))
     //    system.actorOf(Props(classOf[MetricsCache]),"MetricsCache")
     //    system.actorOf(Props(classOf[CacheTest]),"CacheTest")
@@ -56,11 +57,12 @@ class MyTestCollector extends Collector {
             /*
             important! to start timer
              */
-            if (interval > 0) {
-                println(s"start timer ${interval}s")
-                import scala.concurrent.duration._
-                timers.startPeriodicTimer("collect", Collect, interval.seconds)
-            }
+            //            if (interval > 0) {
+            println(s"start timer ${interval}s")
+            //                import scala.concurrent.duration._
+            //                timers.startPeriodicTimer("collect", Collect, interval.seconds)
+            //            }
+            setTimer(interval)
 
         } catch {
             case e: Exception =>
@@ -82,9 +84,9 @@ class MyTestCollector extends Collector {
         )
     }
 
-    override def receive:Receive=super.receive.orElse(
+    override def receive: Receive = super.receive.orElse(
         {
-            case _=>
+            case _ =>
         }
     )
 }
