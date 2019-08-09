@@ -1,7 +1,6 @@
-package com.hpe.ossm.scluster.util
+package com.hpe.ossm.scala.lang.util
 
 import java.util.Properties
-
 import akka.kafka.scaladsl.Consumer
 import akka.kafka.{ConsumerSettings, Subscriptions}
 import akka.stream.scaladsl.{RunnableGraph, Sink}

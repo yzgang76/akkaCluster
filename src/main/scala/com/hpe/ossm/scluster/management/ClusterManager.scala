@@ -2,6 +2,7 @@ package com.hpe.ossm.scluster.management
 
 import java.time.Duration
 import java.util
+
 import akka.actor.{Actor, ActorRef, RootActorPath, Timers}
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberDowned, MemberUp, UnreachableMember}
 import akka.cluster.pubsub.DistributedPubSub
@@ -13,7 +14,7 @@ import com.hpe.ossm.jcluster.messages.{LookingForService, Ping, Pong, ServiceSta
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import akka.cluster.pubsub.DistributedPubSubMediator.{Subscribe, SubscribeAck}
-import com.hpe.ossm.scluster.util.KafkaUtil
+import com.hpe.ossm.scala.lang.util.KafkaUtil
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 

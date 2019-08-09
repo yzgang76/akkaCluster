@@ -5,8 +5,8 @@ import akka.cluster.Cluster
 import akka.cluster.pubsub.{DistributedPubSub, DistributedPubSubMediator}
 import akka.kafka.scaladsl.Consumer.Control
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
+import com.hpe.ossm.scala.lang.util.KafkaUtil
 import com.hpe.ossm.scluster.messges.KPIRecord
-import com.hpe.ossm.scluster.util.KafkaUtil
 import com.typesafe.config.Config
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.json.JSONException

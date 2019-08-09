@@ -11,7 +11,7 @@ import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import com.hpe.ossm.jcluster.messages.LookingForService;
 import com.hpe.ossm.jcluster.messages.ServiceStatusEvents;
-import com.hpe.ossm.scluster.util.KafkaUtil;
+import com.hpe.ossm.scala.lang.util.KafkaUtil;
 import com.typesafe.config.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;

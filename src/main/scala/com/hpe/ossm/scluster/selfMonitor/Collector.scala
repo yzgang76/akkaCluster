@@ -7,13 +7,14 @@ import akka.cluster.Cluster
 import akka.cluster.pubsub.{DistributedPubSub, DistributedPubSubMediator}
 import akka.kafka.scaladsl.Consumer.Control
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
+import com.hpe.ossm.scala.lang.util.KafkaUtil
 import com.hpe.ossm.scluster.messges.{CmdKPIRefresh, Collect, KPIRecord}
-import com.hpe.ossm.scluster.util.KafkaUtil
 import com.typesafe.config.Config
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.json.JSONException
 import org.slf4j.Logger
+
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
@@ -87,9 +88,15 @@ abstract class Collector extends Actor with Timers {
     protected def publish(records: List[KPIRecord]): Unit = {
         //        println(s"publish ${record.toString}")
         if (kafkaActive)
-            records.foreach(r => producer.send(new ProducerRecord[String, java.io.Serializable](topic, key_record, r.toString)))
+            records.foreach(r =>
+                if(r!=null) producer.send(new ProducerRecord[String, java.io.Serializable](topic, key_record, r.toString))
+                else LOGGER.warn(s"Receive Null KPI")
+            )
         else
-            records.foreach(r => mediator ! DistributedPubSubMediator.Publish(topic, r))
+            records.foreach(r =>
+                if(r!=null) mediator ! DistributedPubSubMediator.Publish(topic, r)
+                else LOGGER.warn(s"Receive Null KPI")
+            )
     }
 
     protected def setTimer(interval: Int): Unit = {

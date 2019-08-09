@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<db>
+    <!-- DB type: h2 -->
+    <type>h2</type>
+      
+    <!-- Used for DB transformer end -->
+    <expressions>
+        <expression name="now" value="datediff('ms','1970-01-01',now())" where="datediff('ms','1970-01-01',now())" />
+        <expression name="duration" value="${END}-${FROM}" where = "${END} - ? ${OP} ${FROM}"/>
+    </expressions>
+    
+    <pool>
+        <name>QC</name>
+        <driver>org.h2.Driver</driver>
+        <url>jdbc:h2:tcp://localhost/mem:uocCenterPool;DB_CLOSE_DELAY=-1;MULTI_THREADED=1;LOCK_MODE=3;LOG=0;UNDO_LOG=0;QUERY_STATISTICS=1</url>
+        <usr>sa</usr>
+        <pwd></pwd>
+        <maxtotal>10</maxtotal>
+        <maxwaitmillis>60000</maxwaitmillis>
+        <initialsize>10</initialsize>
+        <testWhileIdle>true</testWhileIdle>
+        <validationQuery>SELECT 1</validationQuery>
+        <interceptor>
+            <preparedStatementCache>
+                <prepared>true</prepared>  <!-- Enable caching of PreparedStatement instances created using prepareStatement calls. -->
+                <callable>false</callable> <!-- Enable caching of CallableStatement instances created using prepareCall calls.-->
+                <max>50</max>              <!-- Limit on the count of cached statements across the connection pool.-->
+            </preparedStatementCache>
+            <slowQueryReport>
+                <threshold>10000</threshold>   <!-- The number of milliseconds a query has to exceed before issuing a log alert. The default value is 1000 milliseconds.  -->
+                <maxQueries>1000</maxQueries> <!-- Maximum number of queries we will be storing. The default value is 1000. -->
+                <logSlow>true</logSlow>       <!-- Flag to enable disable logging of slow queries.-->
+                <logFailed>true</logFailed>   <!-- Flag to enable disable logging of failed queries. -->
+            </slowQueryReport>
+        </interceptor>
+    </pool>
+    
+    <pool>
+        <name>Receiver</name>
+        <driver>org.h2.Driver</driver>
+        <url>jdbc:h2:mem:uocCenterPool;DB_CLOSE_DELAY=-1;MULTI_THREADED=1;LOCK_MODE=3;LOG=0;UNDO_LOG=0</url>
+        <usr>sa</usr>
+        <pwd></pwd>
+        <maxtotal>10</maxtotal>
+        <maxwaitmillis>60000</maxwaitmillis>
+        <initialsize>10</initialsize>
+        <testWhileIdle>true</testWhileIdle>
+        <validationQuery>SELECT 1</validationQuery>
+    </pool>
+    
+    <pool>
+        <name>Topo</name>
+        <maxtotal>10</maxtotal>
+        <maxwaitmillis>60000</maxwaitmillis>
+    </pool>
+    <pool>
+    <name>DC</name>
+    <maxtotal>10</maxtotal>
+        <maxwaitmillis>60000</maxwaitmillis>
+    </pool>
+</db> 

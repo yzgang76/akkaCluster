@@ -13,6 +13,7 @@
         <akka.management.version>1.0.1</akka.management.version>
         <lombok.version>1.18.8</lombok.version>
         <kafka.version>2.3.0</kafka.version>
+        <tomcat-jdbc.version>8.0.39</tomcat-jdbc.version>
     </properties>
 
     <dependencies>
@@ -87,16 +88,6 @@
             <artifactId>akka-stream-kafka_2.12</artifactId>
             <version>1.0.4</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.kafka</groupId>-->
-<!--            <artifactId>kafka_client_2.12</artifactId>-->
-<!--            <version>${kafka.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.sclasen.akka</groupId>-->
-<!--            <artifactId>kafka_2.12</artifactId>-->
-<!--            <version></version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -107,11 +98,41 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.26</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>log4j</groupId>-->
-<!--            <artifactId>log4j</artifactId>-->
-<!--            <version>1.2.17</version>-->
-<!--        </dependency>-->
+<!--        for db connection-->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>${tomcat-jdbc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.197</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.ngoss.owd.java</groupId>
+            <artifactId>dbutils</artifactId>
+            <scope>system</scope>
+            <systemPath>C:/mycode/ossm-server/java/dbutils/target/dbutils-2.6.jar</systemPath>
+<!--            <version>2.6</version>-->
+        </dependency>
+        <dependency>
+            <groupId>com.hp.ngoss.owd.java</groupId>
+            <artifactId>java-intf</artifactId>
+            <scope>system</scope>
+            <systemPath>C:/mycode/ossm-server/java/intf/java-intf/target/java-intf-2.6.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.hp.ngoss.owd.java</groupId>
+            <artifactId>utils</artifactId>
+            <scope>system</scope>
+            <systemPath>C:/mycode/ossm-server/java/utils/target/utils-2.6.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>25.1-jre</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -187,63 +208,63 @@
                 </executions>
             </plugin>
         </plugins>
-       <!-- <plugins>
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <version>4.1.1</version>
-                <executions>
-                    <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>scala-test-compile</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <fork>true</fork>
-                    <compilerArgs>
-                        <arg>-Xlint</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-dependency-plugin</artifactId>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>copy-dependencies</id>-->
-<!--                        <phase>prepare-package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>copy-dependencies</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <outputDirectory>${project.build.directory}/lib</outputDirectory>-->
-<!--                            <overWriteReleases>false</overWriteReleases>-->
-<!--                            <overWriteSnapshots>false</overWriteSnapshots>-->
-<!--                            <overWriteIfNewer>true</overWriteIfNewer>-->
-<!--                            <excludeScope>provided</excludeScope>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
+        <!-- <plugins>
+             <plugin>
+                 <groupId>net.alchim31.maven</groupId>
+                 <artifactId>scala-maven-plugin</artifactId>
+                 <version>4.1.1</version>
+                 <executions>
+                     <execution>
+                         <id>scala-compile-first</id>
+                         <phase>process-resources</phase>
+                         <goals>
+                             <goal>add-source</goal>
+                             <goal>compile</goal>
+                         </goals>
+                     </execution>
+                     <execution>
+                         <id>scala-test-compile</id>
+                         <phase>process-test-resources</phase>
+                         <goals>
+                             <goal>testCompile</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+             </plugin>
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-compiler-plugin</artifactId>
+                 <version>3.1</version>
+                 <configuration>
+                     <source>1.8</source>
+                     <target>1.8</target>
+                     <fork>true</fork>
+                     <compilerArgs>
+                         <arg>-Xlint</arg>
+                     </compilerArgs>
+                 </configuration>
+             </plugin>-->
+        <!--            <plugin>-->
+        <!--                <groupId>org.apache.maven.plugins</groupId>-->
+        <!--                <artifactId>maven-dependency-plugin</artifactId>-->
+        <!--                <executions>-->
+        <!--                    <execution>-->
+        <!--                        <id>copy-dependencies</id>-->
+        <!--                        <phase>prepare-package</phase>-->
+        <!--                        <goals>-->
+        <!--                            <goal>copy-dependencies</goal>-->
+        <!--                        </goals>-->
+        <!--                        <configuration>-->
+        <!--                            <outputDirectory>${project.build.directory}/lib</outputDirectory>-->
+        <!--                            <overWriteReleases>false</overWriteReleases>-->
+        <!--                            <overWriteSnapshots>false</overWriteSnapshots>-->
+        <!--                            <overWriteIfNewer>true</overWriteIfNewer>-->
+        <!--                            <excludeScope>provided</excludeScope>-->
+        <!--                        </configuration>-->
+        <!--                    </execution>-->
+        <!--                </executions>-->
+        <!--            </plugin>-->
+        <!--        </plugins>-->
     </build>
 
 </project>

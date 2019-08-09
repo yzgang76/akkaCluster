@@ -9,11 +9,13 @@ import com.hpe.ossm.scluster.messges.{Collect, KPIRecord, KPIValueType, LastNHis
 import com.hpe.ossm.scluster.selfMonitor.{Collector, Listener, MetricsCache}
 import org.json.JSONArray
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import com.hpe.ossm.jmonitor.test.CollectorInJava
+import com.hpe.ossm.scluster.selfMonitor.collector.impl.ReceiverDBMonitor
 
 object Run {
     def main(args: Array[String]): Unit = {
@@ -22,8 +24,9 @@ object Run {
 }
 
 class MonitorSample extends ClusterNode("selfMonitor", null) {
-    system.actorOf(Props(classOf[MyTestCollector]))
+//    system.actorOf(Props(classOf[MyTestCollector]))
     //    system.actorOf(Props(classOf[CollectorInJava]))
+    system.actorOf(Props(classOf[ReceiverDBMonitor]))
     system.actorOf(Props(classOf[MyListener]))
     //    system.actorOf(Props(classOf[MetricsCache]),"MetricsCache")
     //    system.actorOf(Props(classOf[CacheTest]),"CacheTest")
