@@ -68,7 +68,7 @@ class MetricsCache extends ServiceEntryActor("KPICache", null) {
     }
 
     def dealWithMetric(r: KPIRecord): Unit = {
-        println(s"new record ${r.toString}")
+//        println(s"new record ${r.toString}")
         if (r != null && r.host != null) {
             val l = cache.get(r.name).orNull
             if (l == null) {

@@ -5,7 +5,7 @@ import akka.pattern.Patterns.ask
 import com.hpe.ossm.jcluster.messages.ServiceStatusEvents
 import com.hpe.ossm.scala.lang.util.Util
 import com.hpe.ossm.scluster.{ClusterNode, ServiceEntryActor}
-import com.hpe.ossm.scluster.messges.{Collect, KPIRecord, KPIValueType, LastNHistoryMetric}
+import com.hpe.ossm.scluster.messges.{KPIRecord, KPIValueType, LastNHistoryMetric}
 import com.hpe.ossm.scluster.selfMonitor.{Collector, Listener, MetricsCache}
 import org.json.JSONArray
 import org.slf4j.{Logger, LoggerFactory}
@@ -24,9 +24,9 @@ object Run {
 }
 
 class MonitorSample extends ClusterNode("selfMonitor", null) {
-//    system.actorOf(Props(classOf[MyTestCollector]))
+    system.actorOf(Props(classOf[MyTestCollector]))
     //    system.actorOf(Props(classOf[CollectorInJava]))
-    system.actorOf(Props(classOf[ReceiverDBMonitor]))
+    //    system.actorOf(Props(classOf[ReceiverDBMonitor]))
     system.actorOf(Props(classOf[MyListener]))
     //    system.actorOf(Props(classOf[MetricsCache]),"MetricsCache")
     //    system.actorOf(Props(classOf[CacheTest]),"CacheTest")
@@ -85,6 +85,26 @@ class MyTestCollector extends Collector {
             KPIRecord(host, host, "k2", i + "", KPIValueType.SINGLE_OBJECT, "NA", System.currentTimeMillis()),
             KPIRecord("localhost", "localhost", "k2", i + "", KPIValueType.SINGLE_OBJECT, "NA", System.currentTimeMillis())
         )
+    }
+
+
+    /**
+     * function to collect KPI (name as kpiName) on command
+     */
+    override def refreshKPI(kpiName: String): List[KPIRecord] = {
+        kpiName match {
+            case "k1" =>
+                List(
+                    KPIRecord(host, host, "k1", "[v" + i + ",v]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()),
+                    KPIRecord("localhost", "localhost", "k1", "[v" + i + ",v]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis())
+                )
+            case "k2" =>
+                List(
+                    KPIRecord(host, host, "k2", i + "", KPIValueType.SINGLE_OBJECT, "NA", System.currentTimeMillis()),
+                    KPIRecord("localhost", "localhost", "k2", i + "", KPIValueType.SINGLE_OBJECT, "NA", System.currentTimeMillis())
+                )
+            case _ => List.empty[KPIRecord]
+        }
     }
 
     override def receive: Receive = super.receive.orElse(

@@ -2,6 +2,8 @@ package com.hpe.ossm.scluster.messges
 
 import java.util
 
+import akka.http.scaladsl.model.ws.Message
+import akka.stream.scaladsl.SourceQueueWithComplete
 import org.json.{JSONArray, JSONObject}
 
 object KPIValueType {
@@ -82,6 +84,12 @@ sealed trait IntervalCollectorMessage
 
 case object Collect extends IntervalCollectorMessage
 
+case class SetQueue(q: SourceQueueWithComplete[Message]) extends IntervalCollectorMessage
+
+case object StartPublish extends IntervalCollectorMessage
+
+case object StopPublish extends IntervalCollectorMessage
+
 case class HistoryMetric(name: String, start: Long, end: Long) extends MonitorMessage
 
 case class HistoryMetricOfHost(name: String, start: Long, end: Long, host: String) extends MonitorMessage
@@ -89,3 +97,4 @@ case class HistoryMetricOfHost(name: String, start: Long, end: Long, host: Strin
 case class LastNHistoryMetric(name: String, lastN: Int) extends MonitorMessage
 
 case class LastNHistoryMetricOfHost(name: String, lastN: Int, host: String) extends MonitorMessage
+

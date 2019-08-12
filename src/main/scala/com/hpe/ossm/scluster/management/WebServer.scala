@@ -4,19 +4,24 @@ import akka.Done
 import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.ExceptionHandler
 import akka.management.scaladsl.AkkaManagement
-import akka.stream.{ActorMaterializer, Materializer}
-import com.hpe.ossm.scluster.messges.{CmdKPIRefresh, HistoryMetric, HistoryMetricOfHost, KPIRecord, LastNHistoryMetric, LastNHistoryMetricOfHost, MonitorMessage}
+import akka.stream.{ActorMaterializer, Materializer, OverflowStrategy}
+import com.hpe.ossm.scluster.messges.{CmdKPIRefresh, HistoryMetric, HistoryMetricOfHost, KPIRecord, LastNHistoryMetric, LastNHistoryMetricOfHost, MonitorMessage, SetQueue, StartPublish, StopPublish}
 import com.hpe.ossm.scluster.selfMonitor.MetricsCache
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
-
+import StatusCodes._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import akka.pattern.ask
+import akka.stream.scaladsl.{Flow, Sink, Source}
+import com.hpe.ossm.scluster.selfMonitor.publisher.KpiPublisher
 import org.json.JSONArray
+
 
 class WebServer
 
@@ -45,41 +50,75 @@ object WebServer {
             }
         }
 
+
+        //test route shall migrate to Messager
+        def flowTest: Flow[Message, Message, Any] = {
+            val ref = system.actorOf(KpiPublisher.props())
+            val queueSource = Source.queue[Message](1024, OverflowStrategy.backpressure)
+                .conflateWithSeed(Seq(_)) { (acc, elem) => acc :+ elem }.async
+                .mapMaterializedValue(ref ! SetQueue(_)).async
+                .map(seq => TextMessage(seq.toIterator.toList.map(_.asTextMessage.getStrictText).mkString("|"))).async
+                .watchTermination()((_, t) => {
+                    t.onComplete {
+                        case _ => ref !StopPublish
+                    }
+                })
+            Flow.fromSinkAndSource(Sink.foreach(s => {
+                //                println(s.asTextMessage.getStrictText)
+                s.asTextMessage.getStrictText match {
+                    case "start" => ref ! StartPublish
+                    case "stop" => ref ! StopPublish
+                }
+            }), queueSource)
+        }
+
+        implicit def myExceptionHandler: ExceptionHandler =
+            ExceptionHandler {
+                case e: Exception =>
+                    println(s"$e")
+                    complete(HttpResponse(InternalServerError, entity = "Bad numbers, bad result!!!"))
+
+            }
+
+
         val route =
-            get {
-                path("hello") {
-                    complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Welcome to OSSM BE AKKA Cluster Manager</h1>"))
-                } ~
-                    path("kpis" / Segment) {
-                        kpiName => {
-                            parameters('host.?, 'lastn.?, 'start.?, 'end.?) {
-                                (host, lastn, start, end) => {
-                                    val h = host.getOrElse("")
-                                    val n = lastn.getOrElse("-1").toInt
-                                    val s = start.getOrElse("-1").toLong
-                                    val e = end.getOrElse("-1").toLong
-                                    val msg = buildMonitorMessage(kpiName, h, n, s, e)
-                                    /*  complete(
-                                          HttpEntity(ContentTypes.`application/json`,
-                                              Await.result(
-                                                  ask(cache, msg)(5.seconds).mapTo[List[KPIRecord]].map(l => {
-                                                      val list = new java.util.ArrayList[java.util.Map[String, java.io.Serializable]]()
-                                                      l.foreach(r => list.add(r.toMap))
-                                                      new JSONArray(list).toString
-                                                  }), 5.seconds))
-                                      )*/
-                                    complete(
-                                        ask(cache, msg)(5.seconds).mapTo[List[KPIRecord]].map(l => {
-                                            val list = new java.util.ArrayList[java.util.Map[String, java.io.Serializable]]()
-                                            l.foreach(r => list.add(r.toMap))
-                                            new JSONArray(list).toString
-                                        }).map(c => HttpEntity(ContentTypes.`application/json`, c))
-                                    )
+            path("websocket") {
+                handleWebSocketMessages(flowTest)
+            } ~
+                get {
+                    path("hello") {
+                        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Welcome to OSSM BE AKKA Cluster Manager</h1>"))
+                    } ~
+                        path("kpis" / Segment) {
+                            kpiName => {
+                                parameters('host.?, 'lastn.?, 'start.?, 'end.?) {
+                                    (host, lastn, start, end) => {
+                                        val h = host.getOrElse("")
+                                        val n = lastn.getOrElse("-1").toInt
+                                        val s = start.getOrElse("-1").toLong
+                                        val e = end.getOrElse("-1").toLong
+                                        val msg = buildMonitorMessage(kpiName, h, n, s, e)
+                                        /*  complete(
+                                              HttpEntity(ContentTypes.`application/json`,
+                                                  Await.result(
+                                                      ask(cache, msg)(5.seconds).mapTo[List[KPIRecord]].map(l => {
+                                                          val list = new java.util.ArrayList[java.util.Map[String, java.io.Serializable]]()
+                                                          l.foreach(r => list.add(r.toMap))
+                                                          new JSONArray(list).toString
+                                                      }), 5.seconds))
+                                          )*/
+                                        complete(
+                                            ask(cache, msg)(5.seconds).mapTo[List[KPIRecord]].map(l => {
+                                                val list = new java.util.ArrayList[java.util.Map[String, java.io.Serializable]]()
+                                                l.foreach(r => list.add(r.toMap))
+                                                new JSONArray(list).toString
+                                            }).map(c => HttpEntity(ContentTypes.`application/json`, c))
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
-            } ~
+                } ~
                 put {
                     path("kpis" / Segment) {
                         kpiName => {

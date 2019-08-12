@@ -45,6 +45,8 @@ abstract public class Collector extends AbstractActorWithTimers {
 
     abstract public List<KPIRecord> collect();
 
+    abstract public List<KPIRecord> refreshKPI(String kpiName);
+
     @Override
     public void preStart() throws Exception {
         super.preStart();

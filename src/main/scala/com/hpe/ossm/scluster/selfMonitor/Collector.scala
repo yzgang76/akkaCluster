@@ -6,7 +6,7 @@ import akka.actor.{Actor, Timers}
 import akka.cluster.Cluster
 import akka.cluster.pubsub.{DistributedPubSub, DistributedPubSubMediator}
 import akka.kafka.scaladsl.Consumer.Control
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
+import akka.stream.{ActorMaterializer, Materializer}
 import com.hpe.ossm.scala.lang.util.KafkaUtil
 import com.hpe.ossm.scluster.messges.{CmdKPIRefresh, Collect, KPIRecord}
 import com.typesafe.config.Config
@@ -78,7 +78,7 @@ abstract class Collector extends Actor with Timers {
         case CmdKPIRefresh(kpiName, host, ts) if kpiNames.contains(kpiName) && ((host == null) || host.equals(this.host)) =>
             //make sure the value of 'host' from FE is same as that in BE
             LOGGER.debug(s"Received CMD to refresh the collector ${new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ts)}")
-            publish(collect)
+            publish(refreshKPI(kpiName))
         case Collect =>
             LOGGER.debug(s"Received Collect Message")
             publish(collect)
@@ -86,26 +86,25 @@ abstract class Collector extends Actor with Timers {
 
 
     protected def publish(records: List[KPIRecord]): Unit = {
-        //        println(s"publish ${record.toString}")
         if (kafkaActive)
             records.foreach(r =>
-                if(r!=null) producer.send(new ProducerRecord[String, java.io.Serializable](topic, key_record, r.toString))
+                if (r != null) producer.send(new ProducerRecord[String, java.io.Serializable](topic, key_record, r.toString))
                 else LOGGER.warn(s"Receive Null KPI")
             )
         else
             records.foreach(r =>
-                if(r!=null) mediator ! DistributedPubSubMediator.Publish(topic, r)
+                if (r != null) mediator ! DistributedPubSubMediator.Publish(topic, r)
                 else LOGGER.warn(s"Receive Null KPI")
             )
     }
 
     protected def setTimer(interval: Int): Unit = {
-        publish(collect)  //run collector at beginning
+        publish(collect) //run collector at beginning
         if (interval > 0) timers.startPeriodicTimer("collect", Collect, interval.seconds)
     }
 
 
-    protected def stopSelf() = context stop self
+    protected def stopSelf(): Unit = context stop self
 
     //Functions to be implemented in children
 
@@ -121,5 +120,11 @@ abstract class Collector extends Actor with Timers {
      * @return
      */
     def collect: List[KPIRecord]
+
+    /**
+     * function to collect KPI (name as kpiName) on command
+     */
+
+    def refreshKPI(kpiName: String): List[KPIRecord]
 }
 

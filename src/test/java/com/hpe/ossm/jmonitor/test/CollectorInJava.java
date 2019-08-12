@@ -7,11 +7,11 @@ import com.hpe.ossm.scluster.selfMonitor.Collector;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Serializable;
 import scala.collection.JavaConverters;
 import scala.collection.immutable.List;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 import com.typesafe.config.Config;
@@ -66,14 +66,34 @@ public class CollectorInJava extends Collector {
 
     @Override
     public List<KPIRecord> collect() {
-        i++;
-        java.util.HashMap<String , java.io.Serializable> map=new HashMap<>();
-        map.put("v",i);
-        map.put("v1","k+i");
+        java.util.HashMap<String, java.io.Serializable> map = new HashMap<>();
+        map.put("v", i);
+        map.put("v1", "k+i");
         java.util.List<KPIRecord> l = Arrays.asList(
-                new KPIRecord(host, host, "J1", ""+ i, KPIValueType.SINGLE_OBJECT(), "s", System.currentTimeMillis()),
+                new KPIRecord(host, host, "J1", "" + i, KPIValueType.SINGLE_OBJECT(), "s", System.currentTimeMillis()),
                 new KPIRecord(host, host, "J2", new JSONObject(map).toString(), KPIValueType.JSON_OBJECT(), "NA", System.currentTimeMillis())
         );
         return JavaConverters.asScalaIterator(l.iterator()).toList();
+    }
+
+    @Override
+    public List<KPIRecord> refreshKPI(String kpiName) {
+        if ("J1".equals(kpiName)) {
+            java.util.List<KPIRecord> l = Collections.singletonList(
+                    new KPIRecord(host, host, "J1", "" + i, KPIValueType.SINGLE_OBJECT(), "s", System.currentTimeMillis())
+            );
+            return JavaConverters.asScalaIterator(l.iterator()).toList();
+        } else if ("J2".equals(kpiName)) {
+            java.util.HashMap<String, java.io.Serializable> map = new HashMap<>();
+            map.put("v", i);
+            map.put("v1", "k+i");
+            java.util.List<KPIRecord> l = Collections.singletonList(
+                    new KPIRecord(host, host, "J2", new JSONObject(map).toString(), KPIValueType.JSON_OBJECT(), "NA", System.currentTimeMillis())
+            );
+            return JavaConverters.asScalaIterator(l.iterator()).toList();
+        }else{
+            return JavaConverters.asScalaIterator(Collections.<KPIRecord>emptyIterator()).toList();
+        }
+
     }
 }

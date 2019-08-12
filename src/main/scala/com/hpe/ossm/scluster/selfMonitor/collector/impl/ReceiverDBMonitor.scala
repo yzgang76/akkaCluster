@@ -130,7 +130,31 @@ class ReceiverDBMonitor extends Collector {
                     getRCPT(conn).orNull,
                     getBenchmark(conn).orNull,
                     getStatistics(conn).orNull
-                )
+                ).filter(null == _)
+            } else {
+                List.empty[KPIRecord]
+            }
+        } finally {
+            if (conn != null) {
+                conn.close()
+            }
+        }
+    }
+
+
+    /**
+     * function to collect KPI (name as kpiName) on command
+     */
+    override def refreshKPI(kpiName: String): List[KPIRecord] = {
+        val conn = TomcatJdbcConnection.getConnection("QC").orNull
+        try {
+            if (conn != null) {
+                kpiName match {
+                    case "row_counter_per_table" => List(getRCPT(conn).orNull).filter(_ == null)
+                    case "h2_benchmark" => List(getBenchmark(conn).orNull).filter(_ == null)
+                    case "query_statistic" => List(getStatistics(conn).orNull).filter(_ == null)
+                    case _ => List.empty[KPIRecord]
+                }
             } else {
                 List.empty[KPIRecord]
             }

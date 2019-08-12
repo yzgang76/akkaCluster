@@ -27,7 +27,7 @@ class LocalListener extends Actor with Timers {
     private def reduceConnection(): Unit = {
         connectedSeedNodes = connectedSeedNodes - 1
         if (connectedSeedNodes <= 0) {
-            println("All Seed Nodes are down, showdown the node.")
+            println("All Seed Nodes are down, shutdown the node.")
             cluster.down(cluster.selfAddress)
         }
     }
