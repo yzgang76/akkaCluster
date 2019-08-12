@@ -84,7 +84,6 @@ abstract class Collector extends Actor with Timers {
             publish(collect)
     }
 
-
     protected def publish(records: List[KPIRecord]): Unit = {
         if (kafkaActive)
             records.foreach(r =>

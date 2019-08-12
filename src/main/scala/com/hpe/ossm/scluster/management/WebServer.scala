@@ -59,9 +59,7 @@ object WebServer {
                 .mapMaterializedValue(ref ! SetQueue(_)).async
                 .map(seq => TextMessage(seq.toIterator.toList.map(_.asTextMessage.getStrictText).mkString("|"))).async
                 .watchTermination()((_, t) => {
-                    t.onComplete {
-                        case _ => ref !StopPublish
-                    }
+                    t.onComplete(_ => ref ! StopPublish)
                 })
             Flow.fromSinkAndSource(Sink.foreach(s => {
                 //                println(s.asTextMessage.getStrictText)
