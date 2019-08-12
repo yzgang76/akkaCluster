@@ -21,7 +21,7 @@ import akka.pattern.ask
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.hpe.ossm.scluster.selfMonitor.publisher.KpiPublisher
 import org.json.JSONArray
-
+import scala.collection.JavaConverters._
 
 class WebServer
 
@@ -57,7 +57,12 @@ object WebServer {
             val queueSource = Source.queue[Message](1024, OverflowStrategy.backpressure)
                 .conflateWithSeed(Seq(_)) { (acc, elem) => acc :+ elem }.async
                 .mapMaterializedValue(ref ! SetQueue(_)).async
-                .map(seq => TextMessage(seq.toIterator.toList.map(_.asTextMessage.getStrictText).mkString("|"))).async
+                .map(seq => {
+                    if(seq.length>1)
+                        TextMessage(new JSONArray(asJavaCollection(seq.map(_.asTextMessage.getStrictText).toArray[String])).toString)
+                    else
+                        TextMessage(seq.head.asTextMessage.getStrictText)
+                }).async
                 .watchTermination()((_, t) => {
                     t.onComplete(_ => ref ! StopPublish)
                 })

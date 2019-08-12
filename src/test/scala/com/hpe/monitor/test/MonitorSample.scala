@@ -79,9 +79,10 @@ class MyTestCollector extends Collector {
     override def collect: List[KPIRecord] = {
         i = i + 1
         //        KPIRecord(host, host, "k1", "kpi" + i, KPIValueType.SINGLE_OBJECT, "NA", System.currentTimeMillis())
+
         List(
-            KPIRecord(host, host, "k1", "[v" + i + ",v]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()),
-            KPIRecord("localhost", "localhost", "k1", "[v" + i + ",v]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()),
+            KPIRecord(host, host, "k1", "[" + i + "," + (i + 1) + "]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()),
+            KPIRecord("localhost", "localhost", "k1", "[" + i + "," + (i + 1) + "]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()),
             KPIRecord(host, host, "k2", i + "", KPIValueType.SINGLE_OBJECT, "NA", System.currentTimeMillis()),
             KPIRecord("localhost", "localhost", "k2", i + "", KPIValueType.SINGLE_OBJECT, "NA", System.currentTimeMillis())
         )
@@ -95,8 +96,8 @@ class MyTestCollector extends Collector {
         kpiName match {
             case "k1" =>
                 List(
-                    KPIRecord(host, host, "k1", "[v" + i + ",v]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()),
-                    KPIRecord("localhost", "localhost", "k1", "[v" + i + ",v]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis())
+                    KPIRecord(host, host, "k1","[" + i + "," + (i + 1) + "]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()),
+                    KPIRecord("localhost", "localhost", "k1","[" + i + "," + (i + 1) + "]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis())
                 )
             case "k2" =>
                 List(
