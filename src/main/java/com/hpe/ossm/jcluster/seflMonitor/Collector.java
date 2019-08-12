@@ -103,7 +103,7 @@ abstract public class Collector extends AbstractActorWithTimers {
         return receiveBuilder()
                 .match(CmdKPIRefresh.class, cmd -> {
                     if (kpiNames.contains(cmd.kpiName()) && (host.equals(cmd.host())) || "*".equals(cmd.host())) {
-                        publish(collect());
+                        publish(refreshKPI(cmd.kpiName()));
                     }
                 })
                 .matchEquals("Collect", cmd -> {
