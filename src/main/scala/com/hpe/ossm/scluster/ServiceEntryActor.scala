@@ -50,7 +50,6 @@ abstract class ServiceEntryActor(val serviceName: String, dependServices: mutabl
     import org.apache.kafka.clients.producer.ProducerRecord
 
     private def publishStatusChange(newStatus: String): Unit = {
-        println(s"publishStatusChange")
         status = newStatus
         val ev = buildServiceStatusEvents(kafkaActive)
         if (kafkaActive) {
@@ -63,7 +62,6 @@ abstract class ServiceEntryActor(val serviceName: String, dependServices: mutabl
     }
 
     private def lookingForDependencies(): Unit = {
-        println(s"lookingForDependencies")
         if (null != dependServices)
             if (kafkaActive)
                 dependServices.keySet.foreach(n =>

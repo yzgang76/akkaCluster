@@ -9,11 +9,12 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.management.scaladsl.AkkaManagement
 import akka.stream.{ActorMaterializer, Materializer, OverflowStrategy}
-import com.hpe.ossm.scluster.messges.{CmdKPIRefresh, HistoryMetric, HistoryMetricOfHost, KPIRecord, LastNHistoryMetric, LastNHistoryMetricOfHost, MonitorMessage, SetQueue, StartPublish, StopPublish}
+import com.hpe.ossm.scluster.messges.{CmdKPIRefresh, HistoryMetric, HistoryMetricOfHost, KPIList, KPIRecord, LastNHistoryMetric, LastNHistoryMetricOfHost, MonitorMessage, SetQueue, StartPublish, StopPublish}
 import com.hpe.ossm.scluster.selfMonitor.MetricsCache
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
 import StatusCodes._
+
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -21,6 +22,7 @@ import akka.pattern.ask
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.hpe.ossm.scluster.selfMonitor.publisher.KpiPublisher
 import org.json.JSONArray
+
 import scala.collection.JavaConverters._
 
 class WebServer
@@ -58,7 +60,7 @@ object WebServer {
                 .conflateWithSeed(Seq(_)) { (acc, elem) => acc :+ elem }.async
                 .mapMaterializedValue(ref ! SetQueue(_)).async
                 .map(seq => {
-                    if(seq.length>1)
+                    if (seq.length > 1)
                         TextMessage(new JSONArray(asJavaCollection(seq.map(_.asTextMessage.getStrictText).toArray[String])).toString)
                     else
                         TextMessage(seq.head.asTextMessage.getStrictText)
@@ -78,14 +80,11 @@ object WebServer {
         implicit def myExceptionHandler: ExceptionHandler =
             ExceptionHandler {
                 case e: Exception =>
-                    println(s"$e")
-                    complete(HttpResponse(InternalServerError, entity = "Bad numbers, bad result!!!"))
-
+                    complete(HttpResponse(InternalServerError, entity = s"${e.getMessage}"))
             }
 
-
         val route =
-            path("websocket") {
+            path("kpis") {
                 handleWebSocketMessages(flowTest)
             } ~
                 get {
@@ -101,15 +100,6 @@ object WebServer {
                                         val s = start.getOrElse("-1").toLong
                                         val e = end.getOrElse("-1").toLong
                                         val msg = buildMonitorMessage(kpiName, h, n, s, e)
-                                        /*  complete(
-                                              HttpEntity(ContentTypes.`application/json`,
-                                                  Await.result(
-                                                      ask(cache, msg)(5.seconds).mapTo[List[KPIRecord]].map(l => {
-                                                          val list = new java.util.ArrayList[java.util.Map[String, java.io.Serializable]]()
-                                                          l.foreach(r => list.add(r.toMap))
-                                                          new JSONArray(list).toString
-                                                      }), 5.seconds))
-                                          )*/
                                         complete(
                                             ask(cache, msg)(5.seconds).mapTo[List[KPIRecord]].map(l => {
                                                 val list = new java.util.ArrayList[java.util.Map[String, java.io.Serializable]]()
@@ -120,6 +110,13 @@ object WebServer {
                                     }
                                 }
                             }
+                        } ~
+                        path("kpis") {
+                            complete(
+                                ask(cache, KPIList)(5.seconds).mapTo[collection.Set[String]].map(l =>
+                                    new JSONArray(asJavaCollection(l)).toString
+                                ).map(c => HttpEntity(ContentTypes.`application/json`, c))
+                            )
                         }
                 } ~
                 put {

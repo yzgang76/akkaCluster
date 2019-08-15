@@ -28,7 +28,7 @@ abstract class Collector extends Actor with Timers {
     private val mediator = DistributedPubSub(context.system).mediator
     private implicit val ec: ExecutionContext = context.dispatcher
     private implicit val mat: Materializer = ActorMaterializer.create(context.system)
-    private val host = cluster.selfAddress.host.orNull
+    protected val host: String = cluster.selfAddress.host.orNull
     private val kafkaActive = conf.getBoolean("kafka.active")
     private val topic = conf.getString("ossm.monitor.topic")
     private val key_cmd = conf.getString("ossm.monitor.keys.cmd")

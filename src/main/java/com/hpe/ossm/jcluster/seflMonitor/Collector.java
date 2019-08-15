@@ -31,7 +31,7 @@ abstract public class Collector extends AbstractActorWithTimers {
     private final Cluster cluster = Cluster.get(context().system());
     private final ActorRef mediator = DistributedPubSub.get(context().system()).mediator();
     private final Materializer mat = ActorMaterializer.create(context().system());
-    private final String host = cluster.selfAddress().host().get();
+    protected final String host = cluster.selfAddress().host().get();
     private final Boolean kafkaActive = conf.getBoolean("kafka.active");
     private final String topic = conf.getString("ossm.monitor.topic");
     private final String key_cmd = conf.getString("ossm.monitor.keys.cmd");

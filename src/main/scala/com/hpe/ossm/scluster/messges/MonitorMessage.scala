@@ -45,7 +45,7 @@ case object KPIRecord extends MonitorMessageFactory {
         map.put("name", name)
         map.put("value", value)
         map.put("valueType", valueType)
-        map.put("unit", null)
+        map.put("unit", unit)
         map.put("ts", ts)
         new JSONObject(map).toString
     }
@@ -62,7 +62,7 @@ case object KPIRecord extends MonitorMessageFactory {
             case KPIValueType.JSON_OBJECT => map.put("value", new JSONObject(value).toString)
             case _ => map.put("value", value)
         }
-        map.put("unit", null)
+        map.put("unit", unit)
         map.put("ts", ts)
         map
     }
@@ -85,6 +85,8 @@ sealed trait IntervalCollectorMessage
 case object Collect extends IntervalCollectorMessage
 
 case class SetQueue(q: SourceQueueWithComplete[Message]) extends IntervalCollectorMessage
+
+case object KPIList extends IntervalCollectorMessage
 
 case object StartPublish extends IntervalCollectorMessage
 

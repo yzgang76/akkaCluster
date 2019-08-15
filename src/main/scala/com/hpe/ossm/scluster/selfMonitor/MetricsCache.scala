@@ -6,7 +6,7 @@ import akka.kafka.scaladsl.Consumer.Control
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
 import com.hpe.ossm.scala.lang.util.KafkaUtil
 import com.hpe.ossm.scluster.ServiceEntryActor
-import com.hpe.ossm.scluster.messges.{CmdKPIRefresh, HistoryMetric, HistoryMetricOfHost, KPIRecord, LastNHistoryMetric, LastNHistoryMetricOfHost}
+import com.hpe.ossm.scluster.messges.{CmdKPIRefresh, HistoryMetric, HistoryMetricOfHost, KPIList, KPIRecord, LastNHistoryMetric, LastNHistoryMetricOfHost}
 import com.typesafe.config.Config
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
@@ -68,7 +68,7 @@ class MetricsCache extends ServiceEntryActor("KPICache", null) {
     }
 
     def dealWithMetric(r: KPIRecord): Unit = {
-//        println(s"new record ${r.toString}")
+        //        println(s"new record ${r.toString}")
         if (r != null && r.host != null) {
             val l = cache.get(r.name).orNull
             if (l == null) {
@@ -114,9 +114,9 @@ class MetricsCache extends ServiceEntryActor("KPICache", null) {
             val l = cache.get(name).orNull
             if (l == null) to ! List.empty[KPIRecord]
             else to ! l.filter(e => host.equals(e.host)).takeRight(n)
-        case cmd@CmdKPIRefresh(_, _, _) if ! sender.path.toString.equals(self.path.toString) => publishCmd(cmd)
-        case m: Any => println(s"[cache] unknown message $m")
+        case cmd@CmdKPIRefresh(_, _, _) if !sender.path.toString.equals(self.path.toString) => publishCmd(cmd)
+        case KPIList =>
+            sender ! cache.keySet
+        case m: Any => println(s"[cache] Ignored message $m from $sender")
     })
-
-
 }

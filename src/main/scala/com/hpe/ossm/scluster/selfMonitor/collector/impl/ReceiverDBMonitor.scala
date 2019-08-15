@@ -13,7 +13,7 @@ class ReceiverDBMonitor extends Collector {
     override val LOGGER: Logger = LoggerFactory.getLogger(classOf[ReceiverDBMonitor])
     override val kpiNames = List("row_counter_per_table", "h2_benchmark", "query_statistic")
 
-    private var host: String = _
+//    private var host: String = _
     private var sqlBenchmark: String = _
     private var sqlStatistics: String = _
     private val sqlRCTP =
@@ -23,9 +23,9 @@ class ReceiverDBMonitor extends Collector {
 
     override def initCollector(): Unit = {
         val conf = ConfigFactory.load("selfmonitor.conf").getConfig("collector.receive_db_monitor")
-        host = conf.getString("host")
+//        host = conf.getString("host")
         val interval = conf.getInt("interval")
-        sqlBenchmark = conf.getString("benchmark_request")
+        sqlBenchmark = conf.getString("sql_benchmark")
         sqlStatistics = "select * from INFORMATION_SCHEMA.QUERY_STATISTICS where SQL_STATEMENT='" + sqlBenchmark.replace("'", "''") + "'"
         setTimer(interval)
     }

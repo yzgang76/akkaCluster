@@ -40,7 +40,7 @@ class MyTestCollector extends Collector {
     override val kpiNames = List("k1", "k2")
 
     //collector variables
-    private var host: String = _
+//    private var host: String = _
     private var name: String = _
     private var interval: Int = _
     private var desc: String = _
@@ -51,7 +51,7 @@ class MyTestCollector extends Collector {
         val path = "ossm.monitor.collector.test"
         try {
             val conf = context.system.settings.config.getConfig(path)
-            host = conf.getString("host")
+//            host = conf.getString("host")
             name = conf.getString("name")
             interval = conf.getInt("interval")
             Util.ignoreError(() => desc = conf.getString("desc"))
