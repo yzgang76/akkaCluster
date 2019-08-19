@@ -93,7 +93,7 @@ object WebServer {
                     } ~
                         path("kpis" / Segment) {
                             kpiName => {
-                                parameters('host.?, 'lastn.?, 'start.?, 'end.?) {
+                                parameters('host.?, 'last.?, 'start.?, 'end.?) {
                                     (host, lastn, start, end) => {
                                         val h = host.getOrElse("")
                                         val n = lastn.getOrElse("-1").toInt

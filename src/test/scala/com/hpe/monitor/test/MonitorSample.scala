@@ -2,6 +2,7 @@ package com.hpe.monitor.test
 
 import akka.actor.{ActorRef, Props}
 import akka.pattern.Patterns.ask
+import com.hp.ngoss.uoc.utils.Environment
 import com.hpe.ossm.jcluster.messages.ServiceStatusEvents
 import com.hpe.ossm.scala.lang.util.Util
 import com.hpe.ossm.scluster.{ClusterNode, ServiceEntryActor}
@@ -15,18 +16,23 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import com.hpe.ossm.jmonitor.test.CollectorInJava
+import com.hpe.ossm.scluster.management.WebServer
 import com.hpe.ossm.scluster.selfMonitor.collector.impl.ReceiverDBMonitor
 
 object Run {
     def main(args: Array[String]): Unit = {
+        //TODO:remove it.
+        val p=classOf[WebServer].getResource("/").getPath
+        println(s"$p")
+        Environment.setParam(Environment.PROJ_DATA, classOf[WebServer].getResource("/").getPath)
         new MonitorSample
     }
 }
 
 class MonitorSample extends ClusterNode("selfMonitor", null) {
-    system.actorOf(Props(classOf[MyTestCollector]))
+//    system.actorOf(Props(classOf[MyTestCollector]))
     //    system.actorOf(Props(classOf[CollectorInJava]))
-    //    system.actorOf(Props(classOf[ReceiverDBMonitor]))
+    system.actorOf(Props(classOf[ReceiverDBMonitor]))
     system.actorOf(Props(classOf[MyListener]))
     //    system.actorOf(Props(classOf[MetricsCache]),"MetricsCache")
     //    system.actorOf(Props(classOf[CacheTest]),"CacheTest")
@@ -40,7 +46,7 @@ class MyTestCollector extends Collector {
     override val kpiNames = List("k1", "k2")
 
     //collector variables
-//    private var host: String = _
+    //    private var host: String = _
     private var name: String = _
     private var interval: Int = _
     private var desc: String = _
@@ -51,7 +57,7 @@ class MyTestCollector extends Collector {
         val path = "ossm.monitor.collector.test"
         try {
             val conf = context.system.settings.config.getConfig(path)
-//            host = conf.getString("host")
+            //            host = conf.getString("host")
             name = conf.getString("name")
             interval = conf.getInt("interval")
             Util.ignoreError(() => desc = conf.getString("desc"))
@@ -96,8 +102,8 @@ class MyTestCollector extends Collector {
         kpiName match {
             case "k1" =>
                 List(
-                    KPIRecord(host, host, "k1","[" + i + "," + (i + 1) + "]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()),
-                    KPIRecord("localhost", "localhost", "k1","[" + i + "," + (i + 1) + "]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis())
+                    KPIRecord(host, host, "k1", "[" + i + "," + (i + 1) + "]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()),
+                    KPIRecord("localhost", "localhost", "k1", "[" + i + "," + (i + 1) + "]", KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis())
                 )
             case "k2" =>
                 List(

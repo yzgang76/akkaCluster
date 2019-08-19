@@ -48,5 +48,7 @@ object Tests {
         println(map)
 
         println(m.takeRight(2))
+
+        println(List(Some(1),None).filterNot(_.isEmpty).map(_.get))
     }
 }
