@@ -1,7 +1,6 @@
 package com.hpe.ossm.scluster.selfMonitor.collector.impl
 
 import java.sql.{Connection, ResultSet, Statement}
-
 import com.hpe.ossm.scala.lang.util.TomcatJdbcConnection
 import com.hpe.ossm.scluster.messges.{KPIRecord, KPIValueType}
 import com.hpe.ossm.scluster.selfMonitor.Collector
@@ -9,6 +8,7 @@ import com.typesafe.config.ConfigFactory
 import org.json.JSONObject
 import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
+import com.hpe.ossm.scala.lang.util.Util._
 
 class ReceiverDBMonitor extends Collector {
     override val LOGGER: Logger = LoggerFactory.getLogger(classOf[ReceiverDBMonitor])
@@ -35,41 +35,12 @@ class ReceiverDBMonitor extends Collector {
         dimensions = conf.getStringList("dimensions")
         sqlBenchmark = conf.getString("sql_benchmark")
         topN=conf.getInt("top")
-        sqlStatistics = "select * from INFORMATION_SCHEMA.QUERY_STATISTICS where SQL_STATEMENT='" + sqlBenchmark.replace("'", "''") + "'"
+        sqlStatistics = "select * from INFORMATION_SCHEMA.QUERY_STATISTICS where SQL_STATEMENT like '" + sqlBenchmark.replace("'", "''") + "'"
         setTimer(interval)
     }
 
-    //    private def executeSql(conn: Connection)(f: Statement => Option[KPIRecord]): Option[KPIRecord] = {
-    //        var stat: Statement = null
-    //        try {
-    //            stat = conn.createStatement()
-    //            f(stat)
-    //        } catch {
-    //            case e: Exception =>
-    //                LOGGER.error(s"SQL Error ${e.getMessage}")
-    //                None
-    //        } finally {
-    //            if (stat != null) stat.close()
-    //        }
-    //    }
 
     private def getRCPT(conn: Connection): Option[KPIRecord] = {
-        //        executeSql(conn)((stat) => {
-        //            var rs: ResultSet = null
-        //            try {
-        //                val results = new java.util.HashMap[String, java.io.Serializable]();
-        //                rs = stat.executeQuery(sqlRCTP)
-        //                while (rs.next) results.put(rs.getString(1), rs.getInt(2))
-        //                Some(KPIRecord(host, "Receive H2 DB", "Row Counter per Table", new JSONObject(results).toString, KPIValueType.JSON_OBJECT, "NA", System.currentTimeMillis()))
-        //            } catch {
-        //                case e: Exception =>
-        //                    LOGGER.error(s"SQL Error ${e.getMessage}")
-        //                    None
-        //            } finally {
-        //                if (rs != null) rs.close()
-        //            }
-        //
-        //        })
         val results = new java.util.HashMap[String, java.io.Serializable]()
         var stat: Statement = null
         var rs: ResultSet = null
@@ -90,7 +61,6 @@ class ReceiverDBMonitor extends Collector {
     }
 
     private def getBenchmark(conn: Connection): Option[KPIRecord] = {
-        println(s"bbbb $sqlBenchmark")
         var stat: Statement = null
         var rs: ResultSet = null
         try {
@@ -136,7 +106,7 @@ class ReceiverDBMonitor extends Collector {
         }
     }
 
-    private def convertList(l: List[Option[KPIRecord]]): List[KPIRecord] = l.filterNot(_.isEmpty).map(_.get)
+
 
     private def getTopSqls(conn: Connection, kpiName: String): List[Option[KPIRecord]] = {
         def _getSql(c: String): String = s"select $c,sql_statement from INFORMATION_SCHEMA.QUERY_STATISTICS  where sql_statement not like 'SET%' and sql_statement!='ROOLBACK' order by $c desc limit $topN"
@@ -181,9 +151,7 @@ class ReceiverDBMonitor extends Collector {
                         (for (d <- dimensions.asScala) yield _getKPI(stat, "max_average_execution_time_by_dimension", _getSql2("average_execution_time", d), d)).toList,
                         (for (d <- dimensions.asScala) yield _getKPI(stat, "max_cumulative_execution_time_by_dimension", _getSql2("cumulative_execution_time", d), d)).toList
                     )
-
             }
-
         } catch {
             case e: Exception =>
                 LOGGER.error(s"SQL Error ${e.getMessage}")

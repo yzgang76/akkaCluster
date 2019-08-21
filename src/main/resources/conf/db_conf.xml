@@ -12,7 +12,7 @@
     <pool>
         <name>QC</name>
         <driver>org.h2.Driver</driver>
-        <url>jdbc:h2:tcp://localhost/mem:uocCenterPool;DB_CLOSE_DELAY=-1;MULTI_THREADED=1;LOCK_MODE=3;LOG=0;UNDO_LOG=0;QUERY_STATISTICS=1</url>
+        <url>jdbc:h2:tcp://localhost/mem:uocCenterPool;DB_CLOSE_DELAY=-1;MULTI_THREADED=1;LOCK_MODE=3;LOG=0;UNDO_LOG=0;QUERY_STATISTICS=1;QUERY_STATISTICS_MAX_ENTRIES=1000</url>
         <usr>sa</usr>
         <pwd></pwd>
         <maxtotal>10</maxtotal>
