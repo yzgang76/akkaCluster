@@ -6,7 +6,6 @@ import com.typesafe.config.ConfigFactory
 import org.slf4j.{Logger, LoggerFactory}
 import com.hpe.ossm.scala.lang.util.Util._
 import org.json.JSONObject
-
 import sys.process._
 
 class HostResourceMonitor extends Collector {
@@ -42,8 +41,7 @@ class HostResourceMonitor extends Collector {
 
     private def getMem: Option[KPIRecord] = {
         try {
-            val result = sMEM.!!
-            val rs = result.split(" ")
+            val rs = sMEM.!!.split(" ")
             if (rs.size != 2) {
                 None
             } else {
@@ -65,12 +63,7 @@ class HostResourceMonitor extends Collector {
      * @return
      */
     override def collect: List[KPIRecord] = {
-        convertList(
-            List(
-                getCPU,
-                getMem
-            )
-        )
+        convertList(List(getCPU, getMem))
     }
 
     /**
@@ -78,18 +71,9 @@ class HostResourceMonitor extends Collector {
      */
     override def refreshKPI(kpiName: String): List[KPIRecord] = {
         kpiName match {
-            case CPU_U=> convertList(
-                List(
-                    getCPU
-                )
-            )
-            case MEM_I=> convertList(
-                List(
-                    getMem
-                )
-            )
+            case CPU_U => convertList(List(getCPU))
+            case MEM_I => convertList(List(getMem))
             case _ => List.empty[KPIRecord]
         }
-
     }
 }
