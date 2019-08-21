@@ -48,15 +48,13 @@ class HostResourceMonitor extends Collector {
                 None
             } else {
                 val data = new java.util.HashMap[String, java.io.Serializable]()
-                data.put("free", rs.head.toDouble)
-                data.put("total", rs.last.toDouble)
-                Some(KPIRecord(host, "CPU", MEM_I, new JSONObject(data).toString, KPIValueType.JSON_OBJECT, "k", System.currentTimeMillis()))
+                data.put("total", rs.head.toDouble)
+                data.put("free", rs.last.toDouble)
+                Some(KPIRecord(host, "Memory", MEM_I, new JSONObject(data).toString, KPIValueType.JSON_OBJECT, "MB", System.currentTimeMillis()))
             }
-
-
         } catch {
             case e: Exception =>
-                LOGGER.error(s"Failed to get CPU Utilization ${e.getMessage}")
+                LOGGER.error(s"Failed to get memory information ${e.getMessage}")
                 None
         }
     }
