@@ -25,7 +25,7 @@ class OSSMPackageInfoMonitor extends Collector {
 
     private def getInfo: Option[KPIRecord] = {
         try {
-            Some(KPIRecord(host, "OSSM Package", "package_info", p.!!, KPIValueType.SINGLE_OBJECT, "NA", System.currentTimeMillis()))
+            Some(KPIRecord(host, "OSSM Package", "package_info", p.!!.split("\n").head, KPIValueType.SINGLE_OBJECT, "NA", System.currentTimeMillis()))
         } catch {
             case e: Exception =>
                 LOGGER.error(s"Failed to get CPU Utilization ${e.getMessage}")

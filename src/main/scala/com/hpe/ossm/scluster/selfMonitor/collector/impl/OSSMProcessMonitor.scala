@@ -25,10 +25,8 @@ class OSSMProcessMonitor extends Collector {
 
     private def getInfo: Option[KPIRecord] = {
         try {
-            val s = p.!!
-            val rs = s.split("\n")
-            val a = (for (r <- rs if (r.nonEmpty)) yield r).toList.asJava
-
+            val rs = p.!!.split("\n")
+            val a = (for (r <- rs if r.trim.nonEmpty) yield r).toList.asJava
             Some(KPIRecord(host, "OSSM Processes", "process_info", new JSONArray(a).toString, KPIValueType.JSON_ARRAY, "NA", System.currentTimeMillis()))
         } catch {
             case e: Exception =>
