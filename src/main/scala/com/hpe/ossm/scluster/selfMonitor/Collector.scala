@@ -13,13 +13,13 @@ import com.typesafe.config.Config
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.json.JSONException
-import org.slf4j.Logger
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 abstract class Collector extends Actor with Timers {
-    val LOGGER: Logger
+    protected val LOGGER: Logger = LoggerFactory.getLogger(this.getClass)
     //list of names of KPI
     val kpiNames: List[String]
 

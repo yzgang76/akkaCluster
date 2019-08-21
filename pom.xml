@@ -114,19 +114,21 @@
             <artifactId>dbutils</artifactId>
             <scope>system</scope>
             <systemPath>C:/mycode/ossm-server/java/dbutils/target/dbutils-2.6.jar</systemPath>
-<!--            <version>2.6</version>-->
+            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>com.hp.ngoss.owd.java</groupId>
             <artifactId>java-intf</artifactId>
             <scope>system</scope>
             <systemPath>C:/mycode/ossm-server/java/intf/java-intf/target/java-intf-2.6.jar</systemPath>
+            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>com.hp.ngoss.owd.java</groupId>
             <artifactId>utils</artifactId>
             <scope>system</scope>
             <systemPath>C:/mycode/ossm-server/java/utils/target/utils-2.6.jar</systemPath>
+            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

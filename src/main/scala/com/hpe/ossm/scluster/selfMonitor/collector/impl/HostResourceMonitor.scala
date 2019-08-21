@@ -3,13 +3,11 @@ package com.hpe.ossm.scluster.selfMonitor.collector.impl
 import com.hpe.ossm.scluster.messges.{KPIRecord, KPIValueType}
 import com.hpe.ossm.scluster.selfMonitor.Collector
 import com.typesafe.config.ConfigFactory
-import org.slf4j.{Logger, LoggerFactory}
 import com.hpe.ossm.scala.lang.util.Util._
 import org.json.JSONObject
 import sys.process._
 
 class HostResourceMonitor extends Collector {
-    override val LOGGER: Logger = LoggerFactory.getLogger(classOf[HostResourceMonitor])
     private val CPU_U = "cpu_utilization"
     private val MEM_I = "memory_info"
     override val kpiNames: List[String] = List(CPU_U, MEM_I)

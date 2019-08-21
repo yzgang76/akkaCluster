@@ -6,12 +6,10 @@ import com.hpe.ossm.scluster.messges.{KPIRecord, KPIValueType}
 import com.hpe.ossm.scluster.selfMonitor.Collector
 import com.typesafe.config.ConfigFactory
 import org.json.JSONObject
-import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 import com.hpe.ossm.scala.lang.util.Util._
 
 class ReceiverDBMonitor extends Collector {
-    override val LOGGER: Logger = LoggerFactory.getLogger(classOf[ReceiverDBMonitor])
     override val kpiNames = List("row_counter_per_table", "h2_benchmark", "query_statistic",
         "max_execution_count", "max_average_execution_time", "max_cumulative_execution_time",
         "max_execution_count_by_dimension", "max_average_execution_time_by_dimension", "max_cumulative_execution_time_by_dimension")
