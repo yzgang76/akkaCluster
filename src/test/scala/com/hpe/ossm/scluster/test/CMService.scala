@@ -5,6 +5,9 @@ import akka.cluster.Cluster
 import com.hpe.ossm.scluster.management.DeadLetterListener
 import com.hpe.ossm.scluster.{ClusterNode, ServiceEntryActor}
 
+/**
+ * CM service without dependency
+ */
 class CMService extends ServiceEntryActor("CM", null) {
     val cluster=Cluster(context.system)
     override def preStart(): Unit = {
@@ -13,7 +16,6 @@ class CMService extends ServiceEntryActor("CM", null) {
     }
 
     override def postStop(): Unit = super.postStop()
-
 
     override def receive: Receive = {
         super.receive.orElse {

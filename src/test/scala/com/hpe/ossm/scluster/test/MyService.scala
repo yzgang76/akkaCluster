@@ -12,6 +12,9 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
+/**
+ * MyService depends on CM Service
+ */
 class MyService extends ServiceEntryActor("MyService", List("CM")) {
     implicit val ec: ExecutionContext = context.dispatcher
 

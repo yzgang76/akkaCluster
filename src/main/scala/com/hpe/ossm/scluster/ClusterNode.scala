@@ -5,7 +5,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import scala.concurrent.Future
 
 /**
- * class to start a node in OSSM BE cluster
+ * root class to start a node in OSSM BE cluster
  * @param role : the role of the node
  * @param configName : null for default configuration file e.g. application.conf or the defined file
  */

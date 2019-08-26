@@ -19,7 +19,7 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 
 /**
- *
+ * The root class for all services
  * @param serviceName  : name of the service, it shall be 'unique' in the cluster, but there could be more than on instances
  * @param listOfDepend : a list of name of depend services
  */

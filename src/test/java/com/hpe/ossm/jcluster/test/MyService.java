@@ -15,7 +15,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import static akka.pattern.Patterns.ask;
-
+/**
+ * MyService depends on CM Service
+ */
 public class MyService extends ServiceEntryActor {
 
     @Override

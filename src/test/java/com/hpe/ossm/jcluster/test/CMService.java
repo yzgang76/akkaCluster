@@ -4,7 +4,9 @@ import akka.actor.*;
 import com.hpe.ossm.jcluster.ClusterNode;
 import com.hpe.ossm.jcluster.ServiceEntryActor;
 import java.util.HashMap;
-
+/**
+ * CM service without dependency
+ */
 public class CMService extends ServiceEntryActor {
 
     @Override
@@ -12,6 +14,7 @@ public class CMService extends ServiceEntryActor {
         //override the parameters
         serviceName = "CM";
         setDependServices(null);
+        //must set the parameter before invoke super function
         super.preStart();
     }
 
