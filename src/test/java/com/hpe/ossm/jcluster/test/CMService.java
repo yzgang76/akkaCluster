@@ -11,7 +11,7 @@ public class CMService extends ServiceEntryActor {
     public void preStart() throws  Exception {
         //override the parameters
         serviceName = "CM";
-        dependServices = new HashMap<>();
+        setDependServices(null);
         super.preStart();
     }
 

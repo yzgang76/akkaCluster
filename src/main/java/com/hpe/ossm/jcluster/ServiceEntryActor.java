@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 
@@ -30,7 +31,7 @@ public abstract class ServiceEntryActor extends AbstractActorWithTimers {
     //service name, override in preStart
     protected String serviceName = null;
     //map to store depend service key: service name, value: list of the services in ActorRef, override in preStart
-    protected HashMap<String, Deque<ActorRef>> dependServices = null;
+    private HashMap<String, Deque<ActorRef>> dependServices = new HashMap<>();
     protected Cluster cluster = Cluster.get(context().system());
     private final ActorRef mediator = DistributedPubSub.get(context().system()).mediator();
     protected String status;
@@ -42,6 +43,18 @@ public abstract class ServiceEntryActor extends AbstractActorWithTimers {
     private Consumer.Control consumer;
     private final Materializer mat = ActorMaterializer.create(context().system());
     private final String myPath = self().path().toSerializationFormatWithAddress(cluster.selfAddress());
+
+    /**
+     * @param services list of depend services, null for no dependency
+     */
+    public void setDependServices(java.util.List<String> services) {
+        if (services != null) {
+            for (String s : services) {
+                dependServices.put(s, new ArrayDeque<>());
+            }
+        }
+
+    }
 
     private ServiceStatusEvents buildServiceStatusEvents() {
         return new ServiceStatusEvents(status, serviceName, getSelf(), host);
@@ -69,9 +82,9 @@ public abstract class ServiceEntryActor extends AbstractActorWithTimers {
 
     @Override
     public void preStart() throws Exception {
-        LOGGER.info("Service {}, {} starting", serviceName,myPath);
+        LOGGER.info("Service {}, {} starting", serviceName, myPath);
         super.preStart();
-        if (dependServices != null && dependServices.size() > 0) status = ServiceStatusEvents.STATUS_PENDING;
+        if (!dependServices.isEmpty()) status = ServiceStatusEvents.STATUS_PENDING;
         else status = ServiceStatusEvents.STATUS_AVAILABLE;
         cluster.registerOnMemberUp(() -> {
             if (kafkaActive) {
@@ -107,7 +120,7 @@ public abstract class ServiceEntryActor extends AbstractActorWithTimers {
         } else {
             cluster.unsubscribe(self());
         }
-        LOGGER.info("Service {}, {} stopped", serviceName,myPath);
+        LOGGER.info("Service {}, {} stopped", serviceName, myPath);
         publishStatusChange(ServiceStatusEvents.STATUS_UNAVAILABLE);
     }
 
@@ -190,11 +203,9 @@ public abstract class ServiceEntryActor extends AbstractActorWithTimers {
         return receiveBuilder()
                 .match(ServiceStatusEvents.class, ev -> {
                     System.out.println("[ServiceStatusEvents] " + ev.toString());
-                    if (dependServices != null) {
-                        String serviceName = ev.getServiceName();
-                        if (dependServices.containsKey(serviceName)) {  //depends on the service
-                            updateDependServiceByEvent(ev);
-                        }
+                    String serviceName = ev.getServiceName();
+                    if (dependServices.containsKey(serviceName)) {  //depends on the service
+                        updateDependServiceByEvent(ev);
                     }
                 })
                 .match(LookingForService.class, m -> {
@@ -204,7 +215,7 @@ public abstract class ServiceEntryActor extends AbstractActorWithTimers {
                     }
                 })
                 .match(DistributedPubSubMediator.SubscribeAck.class, msg -> {
-                    if (dependServices == null || dependServices.isEmpty())
+                    if (dependServices.isEmpty())
                         status = ServiceStatusEvents.STATUS_AVAILABLE;
                     else status = ServiceStatusEvents.STATUS_PENDING;
                 })

@@ -10,8 +10,7 @@ import com.hpe.ossm.jcluster.ServiceEntryActor;
 import com.hpe.ossm.jcluster.messages.ServiceStatusEvents;
 
 import java.time.Duration;
-import java.util.ArrayDeque;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -23,8 +22,7 @@ public class MyService extends ServiceEntryActor {
     public void preStart() throws  Exception{
         //override the parameters
         serviceName = "MyService";
-        dependServices = new HashMap<>();
-        dependServices.put("CM", new ArrayDeque<>());
+        setDependServices(Collections.singletonList("CM"));
         super.preStart();
         timers().startPeriodicTimer("service","Hello",Duration.ofSeconds(30));
     }

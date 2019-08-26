@@ -12,7 +12,7 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-class MyService extends ServiceEntryActor("MyService", mutable.HashMap("CM" -> List.empty[ActorRef])) {
+class MyService extends ServiceEntryActor("MyService", List("CM")) {
     implicit val ec: ExecutionContext = context.dispatcher
 
     override def preStart(): Unit = {
@@ -28,8 +28,8 @@ class MyService extends ServiceEntryActor("MyService", mutable.HashMap("CM" -> L
             if (ref != null) {
                 val reply = ask(ref, s, 5.seconds).mapTo[String]
                 reply.onComplete {
-                    case Success(r) =>println("[MyService Reply] " + r)
-                    case Failure(e)=>println(s"Failed to ask. ${e.getMessage}")
+                    case Success(r) => println("[MyService Reply] " + r)
+                    case Failure(e) => println(s"Failed to ask. ${e.getMessage}")
                 }
             }
         case s: Any => println(s"Ignored message ${s.toString}")

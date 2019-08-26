@@ -18,13 +18,24 @@ import scala.concurrent.duration._
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 
-abstract class ServiceEntryActor(val serviceName: String, dependServices: mutable.HashMap[String, List[ActorRef]]) extends Actor with Timers {
+/**
+ *
+ * @param serviceName  : name of the service, it shall be 'unique' in the cluster, but there could be more than on instances
+ * @param listOfDepend : a list of name of depend services
+ */
+abstract class ServiceEntryActor(val serviceName: String, listOfDepend: List[String]) extends Actor with Timers {
     private val LOGGER = LoggerFactory.getLogger(classOf[ServiceEntryActor])
     private val cluster: Cluster = Cluster(context.system)
     implicit private val ec: ExecutionContext = context.dispatcher
     implicit private val mat: Materializer = ActorMaterializer(ActorMaterializerSettings(context.system).withInputBuffer(1, 1))
     private val mediator = DistributedPubSub(context.system).mediator
     private val topic = "ServiceEvents"
+    protected val dependServices = {
+        val t = new mutable.HashMap[String, List[ActorRef]]
+        if (listOfDepend != null && listOfDepend.nonEmpty)
+            listOfDepend.foreach(s => t += (s -> List.empty[ActorRef]))
+        t
+    }
     protected var status: String = if (dependServices != null && dependServices.nonEmpty) ServiceStatusEvents.STATUS_PENDING else ServiceStatusEvents.STATUS_AVAILABLE
     private val host = cluster.selfAddress.host.orNull
     //    private val port = cluster.selfAddress.port.orNull
@@ -72,7 +83,8 @@ abstract class ServiceEntryActor(val serviceName: String, dependServices: mutabl
     }
 
     override def preStart(): Unit = {
-        println(s"Service Actor $serviceName -  $myPath ,${myPath.split("#")(0)}")
+        println(s"Service Actor $serviceName -  $myPath ,${myPath.split("#")(0)} ")
+        LOGGER.info(s"Service Actor $serviceName -  $myPath starting")
         super.preStart()
         cluster.registerOnMemberUp(() => {
             if (kafkaActive) {
@@ -86,7 +98,11 @@ abstract class ServiceEntryActor(val serviceName: String, dependServices: mutabl
                             case _ =>
                         }
                     } catch {
-                        case e: JSONException => println(s"${e.getMessage}\n ${msg.value}")
+                        case e: JSONException => println(s"${
+                            e.getMessage
+                        }\n ${
+                            msg.value
+                        } ")
                     }
                 }).run
             } else {
@@ -101,6 +117,7 @@ abstract class ServiceEntryActor(val serviceName: String, dependServices: mutabl
     }
 
     override def postStop(): Unit = {
+        LOGGER.info(s"Service Actor $serviceName -  $myPath stopping")
         super.postStop()
         if (kafkaActive) {
             producer.close()
@@ -158,7 +175,9 @@ abstract class ServiceEntryActor(val serviceName: String, dependServices: mutabl
         if (ev.getActorRef == null)
             context.actorSelection(ev.getActorPath).resolveOne()(5.seconds).onComplete {
                 case Success(ref) => _updateDependServiceByEvent(ref, findService(ref, services))
-                case _ => println(s"Failed to solve the actor ${ev.getActorPath}")
+                case _ => println(s"Failed to solve the actor ${
+                    ev.getActorPath
+                } ")
             }
         else
             _updateDependServiceByEvent(ev.getActorRef, findService(ev.getActorRef, services))
@@ -182,15 +201,29 @@ abstract class ServiceEntryActor(val serviceName: String, dependServices: mutabl
 
     override def receive: Receive = {
         case ev: ServiceStatusEvents if dependServices != null && dependServices.contains(ev.getServiceName) =>
-            println(s"[ServiceStatusEvents] ${ev.getServiceName} (${ev.getActorRef}) set status to ${ev.getStatus}.")
+            println(s"[ServiceStatusEvents] ${
+                ev.getServiceName
+            } (${
+                ev.getActorRef
+            }) set status to ${
+                ev.getStatus
+            }.")
             updateDependServiceByEvent(ev)
         case ev: LookingForService if serviceName.equals(ev.getServiceName) && ServiceStatusEvents.STATUS_AVAILABLE.equals(status) =>
-            println(s"[LookingForService] ${ev.getServiceName} from ${ev.getSeeker} | ${ev.getSeekerPath}")
+            println(s"[LookingForService] ${
+                ev.getServiceName
+            } from ${
+                ev.getSeeker
+            } | ${
+                ev.getSeekerPath
+            } ")
             if (null != ev.getSeeker) ev.getSeeker ! buildServiceStatusEvents(false)
             else if (null != ev.getSeekerPath) {
                 context.actorSelection(ev.getSeekerPath).resolveOne()(5.seconds).onComplete {
                     case Success(ref) => ref ! buildServiceStatusEvents(false)
-                    case _ => println(s"Failed to solve the actor ${ev.getSeekerPath}")
+                    case _ => println(s"Failed to solve the actor ${
+                        ev.getSeekerPath
+                    } ")
                 }
             }
         case _: DistributedPubSubMediator.SubscribeAck =>
@@ -198,7 +231,9 @@ abstract class ServiceEntryActor(val serviceName: String, dependServices: mutabl
             if (dependServices == null || dependServices.isEmpty) status = ServiceStatusEvents.STATUS_AVAILABLE
             else status = ServiceStatusEvents.STATUS_PENDING
         case Terminated(r) =>
-            println(s"Remove service ${r.path}")
+            println(s"Remove service ${
+                r.path
+            } ")
             dependServices.foreach {
                 case (k, v) => dependServices(k) = removeService(r, v)
             }

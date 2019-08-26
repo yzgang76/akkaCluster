@@ -4,7 +4,6 @@ import akka.actor.{DeadLetter, Props}
 import akka.cluster.Cluster
 import com.hpe.ossm.scluster.management.DeadLetterListener
 import com.hpe.ossm.scluster.{ClusterNode, ServiceEntryActor}
-import com.typesafe.config.Config
 
 class CMService extends ServiceEntryActor("CM", null) {
     val cluster=Cluster(context.system)
@@ -26,11 +25,11 @@ class CMService extends ServiceEntryActor("CM", null) {
     }
 }
 
-class CMServiceApp extends ClusterNode("CMService", null) {}
+class CMServiceApp extends ClusterNode("CMService", null)
 
 object CMServiceNode {
     def main(args: Array[String]): Unit = {
-        val t = new CMServiceApp()
+        val t = new CMServiceApp
         val ref = t.system.actorOf(Props(classOf[DeadLetterListener]), "deadLetterListener")
         t.system.eventStream.subscribe(ref, classOf[DeadLetter])
         t.system.actorOf(Props(classOf[CMService]), "CM")

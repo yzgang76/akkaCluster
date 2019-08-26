@@ -132,7 +132,7 @@ class MyListener extends Listener {
     }
 }
 
-class CacheTest extends ServiceEntryActor("cacheTest", mutable.HashMap("KPICache" -> List.empty[ActorRef])) {
+class CacheTest extends ServiceEntryActor("cacheTest", List("KPICache")) {
     override def preStart(): Unit = {
         super.preStart()
         timers.startPeriodicTimer("test", "test", 5.seconds)
