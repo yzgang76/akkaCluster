@@ -17,7 +17,7 @@ object TomcatJdbcConnection {
         val pool = pools.get(poolName).orNull
         if (pool != null) {
             pools.-=(poolName)
-            pool.close
+            pool.close()
         }
     }
 
@@ -70,5 +70,5 @@ class TomcatJdbcConnection(poolName: String) {
         }
     }
 
-    def close = ds.close()
+    def close(): Unit = ds.close()
 }

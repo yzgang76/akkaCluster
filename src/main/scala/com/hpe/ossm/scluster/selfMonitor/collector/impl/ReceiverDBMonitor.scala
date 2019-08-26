@@ -50,7 +50,7 @@ class ReceiverDBMonitor extends Collector {
                 LOGGER.error(s"SQL Error ${e.getMessage}")
                 None
         } finally {
-            closeNN(rs, stat)(LOGGER)
+            closeNN(rs, stat)
         }
     }
 
@@ -69,7 +69,7 @@ class ReceiverDBMonitor extends Collector {
                 LOGGER.error(s"SQL Error ${e.getMessage}")
                 None
         } finally {
-            closeNN(rs, stat)(LOGGER)
+            closeNN(rs, stat)
         }
     }
 
@@ -93,7 +93,7 @@ class ReceiverDBMonitor extends Collector {
                 LOGGER.error(s"SQL Error ${e.getMessage}")
                 None
         } finally {
-            closeNN(rs, stat)(LOGGER)
+            closeNN(rs, stat)
         }
     }
 
@@ -115,7 +115,7 @@ class ReceiverDBMonitor extends Collector {
                     LOGGER.error(s"SQL Error ${e.getMessage}")
                     None
             } finally {
-                closeNN(rs)(LOGGER)
+                closeNN(rs)
             }
         }
 
@@ -146,7 +146,7 @@ class ReceiverDBMonitor extends Collector {
                 LOGGER.error(s"SQL Error ${e.getMessage}")
                 null
         } finally {
-            closeNN(stat)(LOGGER)
+            closeNN(stat)
         }
     }
 
@@ -163,7 +163,7 @@ class ReceiverDBMonitor extends Collector {
                 List.empty[KPIRecord]
             }
         } finally {
-            closeNN(conn)(LOGGER)
+            closeNN(conn)
         }
     }
 
@@ -187,7 +187,7 @@ class ReceiverDBMonitor extends Collector {
                 List.empty[KPIRecord]
             }
         } finally {
-            closeNN(conn)(LOGGER)
+            closeNN(conn)
         }
     }
 

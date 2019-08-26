@@ -31,16 +31,16 @@ object KafkaUtil {
         props
     }
 
-    def createProcedure(conf: Config): KafkaProducer[String, java.io.Serializable] = new KafkaProducer[String, java.io.Serializable](createProperties(conf, null, false))
+    def createProcedure(conf: Config): KafkaProducer[String, java.io.Serializable] = new KafkaProducer[String, java.io.Serializable](createProperties(conf, null, isConsumer = false))
 
-    def createConsumer(conf: Config, group: String): KafkaConsumer[String, java.io.Serializable] = new KafkaConsumer[String, java.io.Serializable](createProperties(conf, group, true))
+    def createConsumer(conf: Config, group: String): KafkaConsumer[String, java.io.Serializable] = new KafkaConsumer[String, java.io.Serializable](createProperties(conf, group, isConsumer = true))
 
 
     def createAkkaConsumerWithHistoryData(conf: Config, group: String, topic: String, callback: ConsumerRecord[String, String] => Unit): RunnableGraph[Consumer.Control] =
-        _createAkkaConsumer(conf, group, topic, true, callback)
+        _createAkkaConsumer(conf, group, topic, fetchHistory = true, callback)
 
     def createAkkaConsumer(conf: Config, group: String, topic: String, callback: ConsumerRecord[String, String] => Unit): RunnableGraph[Consumer.Control] =
-        _createAkkaConsumer(conf, group, topic, false, callback)
+        _createAkkaConsumer(conf, group, topic, fetchHistory = false, callback)
 
     private def _createAkkaConsumer(conf: Config, group: String, topic: String, fetchHistory: Boolean, callback: ConsumerRecord[String, String] => Unit): RunnableGraph[Consumer.Control] = {
         val consumerSettings =
