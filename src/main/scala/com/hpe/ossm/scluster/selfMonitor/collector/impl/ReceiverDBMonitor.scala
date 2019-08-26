@@ -30,11 +30,10 @@ class ReceiverDBMonitor extends Collector {
         val interval = conf.getInt("interval")
         dimensions = conf.getStringList("dimensions")
         sqlBenchmark = conf.getString("sql_benchmark")
-        topN=conf.getInt("top")
+        topN = conf.getInt("top")
         sqlStatistics = "select * from INFORMATION_SCHEMA.QUERY_STATISTICS where SQL_STATEMENT like '" + sqlBenchmark.replace("'", "''") + "'"
         setTimer(interval)
     }
-
 
     private def getRCPT(conn: Connection): Option[KPIRecord] = {
         val results = new java.util.HashMap[String, java.io.Serializable]()
@@ -51,8 +50,7 @@ class ReceiverDBMonitor extends Collector {
                 LOGGER.error(s"SQL Error ${e.getMessage}")
                 None
         } finally {
-            if (rs != null) rs.close()
-            if (stat != null) stat.close()
+            closeNN(rs, stat)(LOGGER)
         }
     }
 
@@ -71,13 +69,11 @@ class ReceiverDBMonitor extends Collector {
                 LOGGER.error(s"SQL Error ${e.getMessage}")
                 None
         } finally {
-            if (rs != null) rs.close()
-            if (stat != null) stat.close()
+            closeNN(rs, stat)(LOGGER)
         }
     }
 
     private def getStatistics(conn: Connection): Option[KPIRecord] = {
-        println(s"sss $sqlStatistics")
         var stat: Statement = null
         var rs: ResultSet = null
         try {
@@ -97,8 +93,7 @@ class ReceiverDBMonitor extends Collector {
                 LOGGER.error(s"SQL Error ${e.getMessage}")
                 None
         } finally {
-            if (rs != null) rs.close()
-            if (stat != null) stat.close()
+            closeNN(rs, stat)(LOGGER)
         }
     }
 
@@ -120,7 +115,7 @@ class ReceiverDBMonitor extends Collector {
                     LOGGER.error(s"SQL Error ${e.getMessage}")
                     None
             } finally {
-                if (rs != null) rs.close()
+                closeNN(rs)(LOGGER)
             }
         }
 
@@ -151,7 +146,7 @@ class ReceiverDBMonitor extends Collector {
                 LOGGER.error(s"SQL Error ${e.getMessage}")
                 null
         } finally {
-            if (stat != null) stat.close()
+            closeNN(stat)(LOGGER)
         }
     }
 
@@ -168,9 +163,7 @@ class ReceiverDBMonitor extends Collector {
                 List.empty[KPIRecord]
             }
         } finally {
-            if (conn != null) {
-                conn.close()
-            }
+            closeNN(conn)(LOGGER)
         }
     }
 
@@ -194,9 +187,7 @@ class ReceiverDBMonitor extends Collector {
                 List.empty[KPIRecord]
             }
         } finally {
-            if (conn != null) {
-                conn.close()
-            }
+            closeNN(conn)(LOGGER)
         }
     }
 
