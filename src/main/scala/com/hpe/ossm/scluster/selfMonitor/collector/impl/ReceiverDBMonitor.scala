@@ -14,16 +14,14 @@ class ReceiverDBMonitor extends Collector {
         "max_execution_count", "max_average_execution_time", "max_cumulative_execution_time",
         "max_execution_count_by_dimension", "max_average_execution_time_by_dimension", "max_cumulative_execution_time_by_dimension")
 
-    //    private var host: String = _
     private var sqlBenchmark: String = _
     private var sqlStatistics: String = _
     private var dimensions: java.util.List[String] = _
     private var topN: Int = _
-    private val sqlRCTP =
+    private val sqlRCPT =
         """SELECT TABLE_NAME,ROW_COUNT_ESTIMATE
                 FROM INFORMATION_SCHEMA.TABLES
                 Where TABLE_SCHEMA='PUBLIC'"""
-
     private val MO = "Receiver H2"
 
     override def initCollector(): Unit = {
@@ -44,7 +42,7 @@ class ReceiverDBMonitor extends Collector {
         var rs: ResultSet = null
         try {
             stat = conn.createStatement()
-            rs = stat.executeQuery(sqlRCTP)
+            rs = stat.executeQuery(sqlRCPT)
             while (rs.next) results.put(rs.getString(1), rs.getInt(2))
             Some(KPIRecord(host, MO, "row_counter_per_table", new JSONObject(results).toString, KPIValueType.JSON_OBJECT, "NA", System.currentTimeMillis()))
         } catch {
@@ -103,8 +101,6 @@ class ReceiverDBMonitor extends Collector {
             if (stat != null) stat.close()
         }
     }
-
-
 
     private def getTopSqls(conn: Connection, kpiName: String): List[Option[KPIRecord]] = {
         def _getSql(c: String): String = s"select $c,sql_statement from INFORMATION_SCHEMA.QUERY_STATISTICS  where sql_statement not like 'SET%' and sql_statement!='ROOLBACK' order by $c desc limit $topN"
@@ -177,7 +173,6 @@ class ReceiverDBMonitor extends Collector {
             }
         }
     }
-
 
     /**
      * function to collect KPI (name as kpiName) on command

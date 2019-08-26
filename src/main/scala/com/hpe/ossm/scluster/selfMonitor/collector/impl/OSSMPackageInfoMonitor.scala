@@ -17,7 +17,7 @@ class OSSMPackageInfoMonitor extends Collector {
      *
      */
     override def initCollector(): Unit = {
-        p=ConfigFactory.load("selfmonitor.conf").getConfig("collector.package_info").getString("scripts.info")
+        p = ConfigFactory.load("selfmonitor.conf").getConfig("collector.package_info").getString("scripts.info")
         timers.startSingleTimer("collect1", Collect, 5.seconds)
         timers.startSingleTimer("collect2", Collect, 15.seconds)
         timers.startSingleTimer("collect3", Collect, 60.seconds)
@@ -32,6 +32,7 @@ class OSSMPackageInfoMonitor extends Collector {
                 None
         }
     }
+
     /**
      * function to run and publish the configured KPI once
      *

@@ -47,7 +47,6 @@ abstract class Collector extends Actor with Timers {
             if (kafkaActive) {
                 producer = KafkaUtil.createProcedure(conf)
                 consumer = KafkaUtil.createAkkaConsumer(conf, myPath, topic, (msg: ConsumerRecord[String, String]) => {
-                    //                    println(s"[Kafka Record] $msg")
                     try {
                         msg.key match {
                             case `key_cmd` => self ! CmdKPIRefresh.fromString(msg.value)

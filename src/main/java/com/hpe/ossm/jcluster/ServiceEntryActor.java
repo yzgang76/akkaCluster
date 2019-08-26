@@ -47,7 +47,7 @@ public abstract class ServiceEntryActor extends AbstractActorWithTimers {
     /**
      * @param services list of depend services, null for no dependency
      */
-    public void setDependServices(java.util.List<String> services) {
+    protected void setDependServices(java.util.List<String> services) {
         if (services != null) {
             for (String s : services) {
                 dependServices.put(s, new ArrayDeque<>());

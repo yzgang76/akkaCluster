@@ -9,7 +9,8 @@ import com.hpe.ossm.scluster.{ClusterNode, ServiceEntryActor}
  * CM service without dependency
  */
 class CMService extends ServiceEntryActor("CM", null) {
-    val cluster=Cluster(context.system)
+    val cluster: Cluster = Cluster(context.system)
+
     override def preStart(): Unit = {
         println(s"CMService starting")
         super.preStart()
@@ -20,7 +21,7 @@ class CMService extends ServiceEntryActor("CM", null) {
     override def receive: Receive = {
         super.receive.orElse {
             case s: String =>
-                println(s"[CM]received "+s)
+                println(s"[CM]received " + s)
                 sender ! cluster.selfAddress + "|" + s
             case s: Any => println(s"Ignored message ${s.toString}")
         }

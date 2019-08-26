@@ -20,6 +20,7 @@ import scala.concurrent.ExecutionContext
 
 /**
  * The root class for all services
+ *
  * @param serviceName  : name of the service, it shall be 'unique' in the cluster, but there could be more than on instances
  * @param listOfDepend : a list of name of depend services
  */
@@ -30,7 +31,7 @@ abstract class ServiceEntryActor(val serviceName: String, listOfDepend: List[Str
     implicit private val mat: Materializer = ActorMaterializer(ActorMaterializerSettings(context.system).withInputBuffer(1, 1))
     private val mediator = DistributedPubSub(context.system).mediator
     private val topic = "ServiceEvents"
-    protected val dependServices = {
+    protected val dependServices: mutable.HashMap[String, List[ActorRef]] = {
         val t = new mutable.HashMap[String, List[ActorRef]]
         if (listOfDepend != null && listOfDepend.nonEmpty)
             listOfDepend.foreach(s => t += (s -> List.empty[ActorRef]))

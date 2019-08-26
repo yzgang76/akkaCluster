@@ -3,7 +3,6 @@ package com.hpe.ossm.jcluster.test;
 import akka.actor.*;
 import com.hpe.ossm.jcluster.ClusterNode;
 import com.hpe.ossm.jcluster.ServiceEntryActor;
-import java.util.HashMap;
 /**
  * CM service without dependency
  */
