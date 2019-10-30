@@ -181,6 +181,9 @@ class ReceiverDBMonitor extends Collector {
                     case "max_execution_count" => getTopSqls(conn, "max_execution_count")
                     case "max_average_execution_time" => getTopSqls(conn, "max_average_execution_time")
                     case "max_cumulative_execution_time" => getTopSqls(conn, "max_cumulative_execution_time")
+                    case "max_execution_count_by_dimension" => getTopSqls(conn, "max_execution_count_by_dimension")
+                    case "max_average_execution_time_by_dimension" => getTopSqls(conn, "max_average_execution_time_by_dimension")
+                    case "max_cumulative_execution_time_by_dimension" =>getTopSqls(conn, "max_cumulative_execution_time_by_dimension")
                     case _ => List.empty[Option[KPIRecord]]
                 })
             } else {

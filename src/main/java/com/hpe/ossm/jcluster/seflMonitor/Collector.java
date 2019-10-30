@@ -22,9 +22,10 @@ import java.time.Duration;
 import java.util.List;
 
 import org.json.JSONException;
+import org.slf4j.LoggerFactory;
 
 abstract public class Collector extends AbstractActorWithTimers {
-    protected Logger LOGGER;
+    protected Logger LOGGER= LoggerFactory.getLogger(this.getClass());
     protected List<String> kpiNames;
 
     private final Config conf = context().system().settings().config();

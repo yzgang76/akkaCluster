@@ -17,10 +17,6 @@ import java.util.HashMap;
 import com.typesafe.config.Config;
 
 public class CollectorInJava extends Collector {
-    @Override
-    public Logger LOGGER() {
-        return LoggerFactory.getLogger(CollectorInJava.class);
-    }
 
     private String host;
     private String name;

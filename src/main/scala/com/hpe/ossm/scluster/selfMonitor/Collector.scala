@@ -18,9 +18,12 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
+/**
+ * root class for all collectors of self monitor
+ */
 abstract class Collector extends Actor with Timers {
     protected val LOGGER: Logger = LoggerFactory.getLogger(this.getClass)
-    //list of names of KPI
+    //list of names of KPI: uses to filter refresh cmd
     val kpiNames: List[String]
 
     protected val conf: Config = context.system.settings.config
